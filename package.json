@@ -1,0 +1,33 @@
+{
+	"name": "@jdeighan/grammar",
+	"version": "1.0.0",
+	"type": "module",
+	"license": "MIT",
+	"author": "John Deighan",
+	"description": "grammar parsing utilities",
+	"exports": {
+		".": "./src/lib/grammar-utils.js",
+		"./rule-ex": "./src/lib/rule-ex.js",
+		"./package.json": "./package.json"
+	},
+	"scripts": {
+		"build:coffee": "coffee -cmb --no-header .",
+		"build:peggy": "proc-all-peggy",
+		"build:all": "npm run build:coffee && npm run build:peggy",
+		"build": "npm run build:all",
+		"test": "npm run build && npx ava --timeout=1m ./test/*.test.js && git status"
+	},
+	"keywords": [],
+	"devDependencies": {
+		"ava": "^6.1.3",
+		"coffeescript": "^2.7.0",
+		"concurrently": "^8.2.2"
+	},
+	"dependencies": {
+		"@jdeighan/llutils": "^4.0.1"
+	},
+	"directories": {
+		"test": "test"
+	},
+	"packageManager": "yarn@1.22.22"
+}

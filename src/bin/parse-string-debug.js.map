@@ -1,0 +1,13 @@
+{
+  "version": 3,
+  "file": "parse-string-debug.js",
+  "sourceRoot": "..\\..\\",
+  "sources": [
+    "src\\bin\\parse-string-debug.coffee"
+  ],
+  "names": [],
+  "mappings": "AAA2B;AAAA,IAAA,GAAA,EAAA,GAAA,EAAA,QAAA,EAAA,IAAA,EAAA,MAAA,EAAA,EAAA,EAAA;;AAE3B,OAAO,CAAA,YAAP,MAAA;;AACA,OAAA;EAAQ,KAAR;EAAe,MAAf;CAAA,MAAA;;AACA,EAAA,GAAK,QAAQ,CAAC,eAAT,CAAyB;EAC7B,KAAA,EAAO,KADsB;EAE7B,MAAA,EAAQ,MAFqB;EAG7B,QAAA,EAAU;AAHmB,CAAzB;;AAML,OAAA;EACC,KADD;EACQ,OADR;EACiB,UADjB;EAC6B,GAD7B;EACkC,EADlC;CAAA,MAAA;;AAGA,OAAA;EAAQ,KAAR;CAAA,MAAA;;AACA,OAAO,CAAA,OAAP,MAAA;;AACA,MAAM,CAAC,MAAP,CAAc,MAAd,EAAsB,GAAtB;;AACA,OAAA;EAAQ,QAAR;CAAA,MAAA;;AAEA,aAAA,GAAgB,OAAO,CAAC,IAAI,CAAC,CAAD,CAAZ,IAAmB;;AACnC,GAAA,CAAI,CAAA,SAAA,CAAA,CAAY,EAAA,CAAG,aAAH,CAAZ,CAAA,CAAJ,EAnB2B;;;AAuB3B,MAAA,GAAS,IAAI,YAAJ,CAAiB,QAAjB;;AACT,GAAA,CAAI,MAAM,CAAC,QAAP,CAAA,CAAJ;;AAEA,QAAA,GAAW,MAAM,CAAC,eAAP,CAAuB,aAAvB,EAAsC,OAAtC;;AACX;AACC,SAAA,IAAA;IACC,GAAA,GAAM,CAAA,MAAM,EAAE,CAAC,QAAH,CAAY,IAAZ,CAAN;AACN,YAAO,GAAP;AAAA,WACM,GADN;QAEE,GAAA,CAAI,aAAJ;QACA,OAAO,CAAC,IAAR,CAAA;AAFI;AADN;QAKE,IAAA,GAAO,QAAQ,CAAC,IAAT,CAAA;QACP,IAAG,IAAI,CAAC,IAAR;UACC,GAAA,CAAI,CAAA,UAAA,CAAA,CAAa,EAAA,CAAG,IAAI,CAAC,KAAR,CAAb,CAAA,CAAJ;UACA,OAAO,CAAC,IAAR,CAAA,EAFD;;AANF;EAFD,CADD;CAYA,aAAA;EAAM;EACL,IAAI,GAAA,YAAe,WAAnB;IACC,GAAA,CAAI,CAAA,cAAA,CAAA,CAAiB,GAAG,CAAC,OAArB,CAAA,CAAJ,EADD;GAAA,MAAA;IAGC,GAAA,CAAI,CAAA,OAAA,CAAA,CAAU,GAAG,CAAC,OAAd,CAAA,CAAJ,EAHD;;EAIA,OAAO,CAAC,IAAR,CAAA,EALD",
+  "sourcesContent": [
+    "# parse-string-debug.coffee\r\n\r\nimport * as readline from 'node:readline/promises'\r\nimport {stdin, stdout} from 'node:process'\r\nrl = readline.createInterface {\r\n\tinput: stdin\r\n\toutput: stdout\r\n\tterminal: true\r\n\t}\r\n\r\nimport {\r\n\tundef, defined, notdefined, LOG, OL,\r\n\t} from '@jdeighan/llutils'\r\nimport {slurp} from '@jdeighan/llutils/fs'\r\nimport * as lib from '@jdeighan/grammar'\r\nObject.assign(global, lib)\r\nimport {hExprAST} from '../../test/grammar/grammars.js'\r\n\r\nstringToParse = process.argv[2] || 'a*a'\r\nLOG \"PARSING: #{OL(stringToParse)}\"\r\n\r\n# ---------------------------------------------------------------------------\r\n\r\nparser = new EarleyParser(hExprAST)\r\nLOG parser.asString()\r\n\r\niterator = parser.parse_generator(stringToParse, 'debug')\r\ntry\r\n\tloop\r\n\t\tans = await rl.question('> ')\r\n\t\tswitch ans\r\n\t\t\twhen 'q'\r\n\t\t\t\tLOG 'quitting...'\r\n\t\t\t\tprocess.exit()\r\n\t\t\telse\r\n\t\t\t\tnext = iterator.next()\r\n\t\t\t\tif next.done\r\n\t\t\t\t\tLOG \"\\nRESULT: #{OL(next.value)}\"\r\n\t\t\t\t\tprocess.exit()\r\ncatch err\r\n\tif (err instanceof SyntaxError)\r\n\t\tLOG \"Syntax Error: #{err.message}\"\r\n\telse\r\n\t\tLOG \"ERROR: #{err.message}\"\r\n\tprocess.exit()\r\n"
+  ]
+}
