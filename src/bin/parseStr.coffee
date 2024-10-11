@@ -1,4 +1,4 @@
-# parse-input-string.coffee
+# parseStr.coffee
 
 import {
 	undef, defined, notdefined, LOG, OL,
@@ -6,7 +6,7 @@ import {
 import {slurp} from '@jdeighan/llutils/fs'
 import * as lib from '@jdeighan/grammar'
 Object.assign(global, lib)
-import {hExprAST} from '../../test/grammar/grammars.js'
+import {hExprAST} from '@jdeighan/grammar/grammars'
 
 stringToParse = process.argv[2] || 'a*a'
 

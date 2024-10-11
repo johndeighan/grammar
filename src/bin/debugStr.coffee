@@ -1,4 +1,4 @@
-# parse-string-debug.coffee
+# debugStr.coffee
 
 import * as readline from 'node:readline/promises'
 import {stdin, stdout} from 'node:process'
@@ -14,7 +14,7 @@ import {
 import {slurp} from '@jdeighan/llutils/fs'
 import * as lib from '@jdeighan/grammar'
 Object.assign(global, lib)
-import {hExprAST} from '../../test/grammar/grammars.js'
+import {hExprAST} from '@jdeighan/grammar/grammars'
 
 stringToParse = process.argv[2] || 'a*a'
 LOG "PARSING: #{OL(stringToParse)}"

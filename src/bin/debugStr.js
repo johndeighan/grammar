@@ -1,4 +1,4 @@
-// parse-string-debug.coffee
+// debugStr.coffee
 var ans, err, iterator, next, parser, rl, stringToParse;
 
 import * as readline from 'node:readline/promises';
@@ -32,7 +32,7 @@ Object.assign(global, lib);
 
 import {
   hExprAST
-} from '../../test/grammar/grammars.js';
+} from '@jdeighan/grammar/grammars';
 
 stringToParse = process.argv[2] || 'a*a';
 
@@ -71,4 +71,4 @@ try {
   process.exit();
 }
 
-//# sourceMappingURL=parse-string-debug.js.map
+//# sourceMappingURL=debugStr.js.map

@@ -1,4 +1,4 @@
-// parse-input-string.coffee
+// parseStr.coffee
 var err, parser, result, stringToParse;
 
 import {
@@ -19,7 +19,7 @@ Object.assign(global, lib);
 
 import {
   hExprAST
-} from '../../test/grammar/grammars.js';
+} from '@jdeighan/grammar/grammars';
 
 stringToParse = process.argv[2] || 'a*a';
 
@@ -42,4 +42,4 @@ try {
   }
 }
 
-//# sourceMappingURL=parse-input-string.js.map
+//# sourceMappingURL=parseStr.js.map
