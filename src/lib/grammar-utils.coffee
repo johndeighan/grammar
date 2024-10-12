@@ -215,8 +215,6 @@ export class EarleyParser
 			yield from @expandSet S, i, str, {debug}
 
 		yield from @expandSet S, n, str, {debug}
-		if debug
-			LOG @setStr(S[n], n)
 		for xRule from S[n].values()
 			if @isFinal(xRule)
 				return "OK"

@@ -23,7 +23,7 @@ Object.assign(global, lib);
 
 import {
   hExprAST
-} from './grammar/grammars.js';
+} from '@jdeighan/grammar/grammars';
 
 // ---------------------------------------------------------------------------
 //symbol RuleEx
@@ -143,4 +143,4 @@ fails(() => {
   return parser.parse("a*a+");
 });
 
-//# sourceMappingURL=grammar.test.js.map
+//# sourceMappingURL=grammar-utils.test.js.map

@@ -1,5 +1,5 @@
 // debugStr.coffee
-var ans, err, iterator, next, parser, rl, stringToParse;
+var _, ans, err, go, iterator, next, parser, rl, stringToParse;
 
 import * as readline from 'node:readline/promises';
 
@@ -19,8 +19,13 @@ import {
   defined,
   notdefined,
   LOG,
-  OL
+  OL,
+  nonEmpty
 } from '@jdeighan/llutils';
+
+import {
+  getArgs
+} from '@jdeighan/llutils/cmd-args';
 
 import {
   slurp
@@ -34,7 +39,20 @@ import {
   hExprAST
 } from '@jdeighan/grammar/grammars';
 
-stringToParse = process.argv[2] || 'a*a';
+({
+  _,
+  g: go
+} = getArgs({
+  _: {
+    min: 0,
+    max: 1 // string to parse
+  },
+  g: {
+    type: 'boolean'
+  }
+}));
+
+stringToParse = nonEmpty(_) ? _[0] : 'a+a';
 
 LOG(`PARSING: ${OL(stringToParse)}`);
 
@@ -47,11 +65,19 @@ iterator = parser.parse_generator(stringToParse, 'debug');
 
 try {
   while (true) {
-    ans = (await rl.question('> '));
+    if (go) {
+      ans = undef;
+    } else {
+      ans = (await rl.question('> '));
+    }
     switch (ans) {
       case 'q':
         LOG('quitting...');
         process.exit();
+        break;
+      case 'go':
+      case 'g':
+        go = true;
         break;
       default:
         next = iterator.next();

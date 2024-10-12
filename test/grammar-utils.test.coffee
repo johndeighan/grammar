@@ -10,7 +10,7 @@ import * as lib2 from '@jdeighan/llutils/utest'
 Object.assign(global, lib2)
 import * as lib from '@jdeighan/grammar'
 Object.assign(global, lib)
-import {hExprAST} from './grammar/grammars.js'
+import {hExprAST} from '@jdeighan/grammar/grammars'
 
 # ---------------------------------------------------------------------------
 #symbol RuleEx

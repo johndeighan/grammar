@@ -246,9 +246,6 @@ export var EarleyParser = class EarleyParser {
       yield* this.expandSet(S, i, str, {debug});
     }
     yield* this.expandSet(S, n, str, {debug});
-    if (debug) {
-      LOG(this.setStr(S[n], n));
-    }
     ref1 = S[n].values();
     for (xRule of ref1) {
       if (this.isFinal(xRule)) {

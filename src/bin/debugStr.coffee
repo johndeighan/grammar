@@ -9,14 +9,20 @@ rl = readline.createInterface {
 	}
 
 import {
-	undef, defined, notdefined, LOG, OL,
+	undef, defined, notdefined, LOG, OL, nonEmpty,
 	} from '@jdeighan/llutils'
+import {getArgs} from '@jdeighan/llutils/cmd-args'
 import {slurp} from '@jdeighan/llutils/fs'
 import * as lib from '@jdeighan/grammar'
 Object.assign(global, lib)
 import {hExprAST} from '@jdeighan/grammar/grammars'
 
-stringToParse = process.argv[2] || 'a*a'
+{_, g:go} = getArgs {
+	_: {min: 0, max: 1}    # string to parse
+	g: {type: 'boolean'}
+	}
+
+stringToParse = if nonEmpty(_) then _[0] else 'a+a'
 LOG "PARSING: #{OL(stringToParse)}"
 
 # ---------------------------------------------------------------------------
@@ -27,11 +33,16 @@ LOG parser.asString()
 iterator = parser.parse_generator(stringToParse, 'debug')
 try
 	loop
-		ans = await rl.question('> ')
+		if go
+			ans = undef
+		else
+			ans = await rl.question('> ')
 		switch ans
 			when 'q'
 				LOG 'quitting...'
 				process.exit()
+			when 'go','g'
+				go = true
 			else
 				next = iterator.next()
 				if next.done
