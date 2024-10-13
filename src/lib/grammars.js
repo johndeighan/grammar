@@ -5,7 +5,7 @@ import {
 } from '@jdeighan/grammar/rule-ex';
 
 // ---------------------------------------------------------------------------
-export var hExprAST = {
+export var hSimpleAST = {
   type: "grammar",
   lRules: [
     {

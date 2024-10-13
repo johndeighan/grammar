@@ -1,9 +1,9 @@
 # rule-ex.coffee
 
 import {
-	undef, defined, notdefined, OL, ML, hasKey,
+	undef, defined, notdefined, OL, ML, hasKey, identityFunc,
 	isString, isInteger, isArray,
-	assert, croak,
+	assert, croak, getOptions,
 	} from '@jdeighan/llutils'
 import {MultiMap} from '@jdeighan/llutils/multi-map'
 
@@ -60,8 +60,19 @@ export class RuleEx
 
 	asString: () ->
 
-		return "[#{@id}] #{ruleAsString(@hRule, @pos)} / #{@src}"
+		return "[#{@id}] #{ruleAsString(@hRule, {pos: @pos})} / #{@src}"
 
+# ---------------------------------------------------------------------------
+# An hRule looks like:
+#    {
+#       type: 'rule'
+#       head: String
+#       lParts: [
+#          {
+#             type: 'terminal' | 'nonterminal',
+#             value: String
+#             }
+#       }
 # ---------------------------------------------------------------------------
 
 export terminal = (value) ->
@@ -93,7 +104,6 @@ export checkRule = (hRule, id=1) ->
 		(hRule.type == "rule"),
 		hasKey(hRule, 'head'),
 		isString(hRule.head),
-#		(hRule.head != phi) || (id == 0),
 		hasKey(hRule, 'lParts'),
 		isArray(hRule.lParts),
 		], "Bad rule: #{OL(hRule)}"
@@ -101,15 +111,51 @@ export checkRule = (hRule, id=1) ->
 
 # ---------------------------------------------------------------------------
 
-export ruleAsString = (hRule, pos=undef) ->
+export ruleFromString = (str, hOptions={}) ->
+
+	{classify} = getOptions hOptions, {
+		classify: (s) =>
+			if s.match(/^[A-Z][A-Za-z]*$/)
+				return 'nonterminal'
+			else
+				return 'terminal'
+		}
+	lParts = str.split(/\s+/)
+	assert [
+		(lParts.length > 2),
+		(lParts[1] == '->'),
+		(classify(lParts[0]) == 'nonterminal')
+		], "Bad rule: #{OL(str)}"
+	return {
+		type: 'rule'
+		head: lParts[0]
+		lParts: lParts.slice(2).map((x) =>
+			switch classify(x)
+				when 'nonterminal'
+					{type: 'nonterminal', value: x}
+				when 'terminal'
+					{type: 'terminal', value: x}
+				else
+					croak "Bad rule: #{OL(str)}"
+			)
+		}
+# ---------------------------------------------------------------------------
+
+export ruleAsString = (hRule, hOptions={}) ->
+
+	{pos, transformTerminal, transformNonTerminal} = getOptions hOptions, {
+		pos: undef
+		transformTerminal: identityFunc
+		transformNonTerminal: identityFunc
+		}
 
 	lRHS = hRule.lParts.map(
 		(hPart) =>
 			switch hPart.type
 				when "terminal"
-					return "\"#{hPart.value}\""
+					return transformTerminal(hPart.value)
 				when "nonterminal"
-					return "#{hPart.value}"
+					return transformNonTerminal(hPart.value)
 		)
 	if defined(pos)
 		lRHS.splice pos, 0, raisedDot

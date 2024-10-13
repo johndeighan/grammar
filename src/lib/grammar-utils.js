@@ -32,15 +32,39 @@ import {
   phi,
   RuleEx,
   checkRule,
+  ruleFromString,
   ruleAsString
 } from '@jdeighan/grammar/rule-ex';
 
 // ---------------------------------------------------------------------------
 //     class Grammar
 // ---------------------------------------------------------------------------
+//     A Grammar AST looks like:
+//        {
+//           type: 'grammar'
+//           lRules: [
+//              {
+//                 type: "rule"
+//                 head: "E"
+//                 lParts: [
+//                    {type: 'nonterminal, type: 'E"},
+//                    {type: 'terminal, type: '"+"},
+//                    {type: 'nonterminal, type: '"T"},
+//                    ]
+//                 },
+//              {
+//                 type: "rule"
+//                 head: "E"
+//                 lParts: [
+//                    {type: 'nonterminal, type: '"T"},
+//                    ]
+//                 },
+//           }
+// ---------------------------------------------------------------------------
 export var Grammar = class Grammar {
-  constructor(hAST1) {
+  constructor(hAST1, hOptions = {}) {
     this.hAST = hAST1;
+    assert(isGrammarAST(this.hAST), `Not a grammar AST: ${OL(this.hAST)}`);
     [this.setNonTerminals, this.setTerminals] = checkAST(this.hAST);
   }
 
@@ -100,9 +124,17 @@ export var Grammar = class Grammar {
 //     class EarleyParser
 // ---------------------------------------------------------------------------
 export var EarleyParser = class EarleyParser {
-  constructor(hAST) {
-    var rootRule;
-    this.grammar = new Grammar(hAST);
+  constructor(desc, hOptions = {}) {
+    var rootRule, transform;
+    ({transform} = getOptions(hOptions, {
+      transform: astFromString
+    }));
+    // --- input can be an AST or a string
+    if (isString(desc)) {
+      this.grammar = new Grammar(transform(desc));
+    } else {
+      this.grammar = new Grammar(desc);
+    }
     assert(this.grammar instanceof Grammar, "Not a grammar");
     // --- Add a phi rule at start of grammar's rule list
     rootRule = {
@@ -314,6 +346,25 @@ export var EarleyParser = class EarleyParser {
 
 // ---------------------------------------------------------------------------
 //     Utility Functions
+// ---------------------------------------------------------------------------
+export var astFromString = (str) => {
+  var lRules;
+  lRules = str.split("\n").filter((line) => {
+    return nonEmpty(line);
+  }).map((line) => {
+    return ruleFromString(line);
+  });
+  return {
+    type: 'grammar',
+    lRules
+  };
+};
+
+// ---------------------------------------------------------------------------
+export var isGrammarAST = (desc) => {
+  return isHash(desc) && (desc.type === 'grammar');
+};
+
 // ---------------------------------------------------------------------------
 // --- returns [<set of nonterminals>, <set of terminals>]
 //     croaks if RHS of a rule has an undefined nonterminal

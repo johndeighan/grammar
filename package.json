@@ -9,13 +9,18 @@
 		".": "./src/lib/grammar-utils.js",
 		"./rule-ex": "./src/lib/rule-ex.js",
 		"./grammars": "./src/lib/grammars.js",
+		"./parse-expr": "./src/lib/parse-expr.js",
 		"./package.json": "./package.json"
+	},
+	"bin": {
+		"parseStr": "src/bin/parseStr.js",
+		"debugStr": "src/bin/debugStr.js"
 	},
 	"scripts": {
 		"build:coffee": "coffee -cmb --no-header .",
 		"build:peggy": "proc-all-peggy",
 		"build:all": "npm run build:coffee && npm run build:peggy",
-		"build": "npm run build:all",
+		"build": "clear && npm run build:all && llb -d",
 		"test": "npm run build && npx ava --timeout=1m ./test/*.test.js && git status"
 	},
 	"keywords": [],

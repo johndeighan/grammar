@@ -8,11 +8,13 @@ import {
   OL,
   ML,
   hasKey,
+  identityFunc,
   isString,
   isInteger,
   isArray,
   assert,
-  croak
+  croak,
+  getOptions
 } from '@jdeighan/llutils';
 
 import {
@@ -75,7 +77,9 @@ export var RuleEx = (function() {
     }
 
     asString() {
-      return `[${this.id}] ${ruleAsString(this.hRule, this.pos)} / ${this.src}`;
+      return `[${this.id}] ${ruleAsString(this.hRule, {
+        pos: this.pos
+      })} / ${this.src}`;
     }
 
   };
@@ -88,6 +92,17 @@ export var RuleEx = (function() {
 
 }).call(this);
 
+// ---------------------------------------------------------------------------
+// An hRule looks like:
+//    {
+//       type: 'rule'
+//       head: String
+//       lParts: [
+//          {
+//             type: 'terminal' | 'nonterminal',
+//             value: String
+//             }
+//       }
 // ---------------------------------------------------------------------------
 export var terminal = function(value) {
   assert([isString(value), value.length === 1], `Bad terminal: ${OL(value)}`);
@@ -108,27 +123,59 @@ export var nonterminal = function(name) {
 
 // ---------------------------------------------------------------------------
 export var checkRule = function(hRule, id = 1) {
-  assert([
-    hRule.type === "rule",
-    hasKey(hRule,
-    'head'),
-    isString(hRule.head),
-    //		(hRule.head != phi) || (id == 0),
-    hasKey(hRule,
-    'lParts'),
-    isArray(hRule.lParts)
-  ], `Bad rule: ${OL(hRule)}`);
+  assert([hRule.type === "rule", hasKey(hRule, 'head'), isString(hRule.head), hasKey(hRule, 'lParts'), isArray(hRule.lParts)], `Bad rule: ${OL(hRule)}`);
 };
 
 // ---------------------------------------------------------------------------
-export var ruleAsString = function(hRule, pos = undef) {
-  var lRHS, rhs;
+export var ruleFromString = function(str, hOptions = {}) {
+  var classify, lParts;
+  ({classify} = getOptions(hOptions, {
+    classify: (s) => {
+      if (s.match(/^[A-Z][A-Za-z]*$/)) {
+        return 'nonterminal';
+      } else {
+        return 'terminal';
+      }
+    }
+  }));
+  lParts = str.split(/\s+/);
+  assert([lParts.length > 2, lParts[1] === '->', classify(lParts[0]) === 'nonterminal'], `Bad rule: ${OL(str)}`);
+  return {
+    type: 'rule',
+    head: lParts[0],
+    lParts: lParts.slice(2).map((x) => {
+      switch (classify(x)) {
+        case 'nonterminal':
+          return {
+            type: 'nonterminal',
+            value: x
+          };
+        case 'terminal':
+          return {
+            type: 'terminal',
+            value: x
+          };
+        default:
+          return croak(`Bad rule: ${OL(str)}`);
+      }
+    })
+  };
+};
+
+// ---------------------------------------------------------------------------
+export var ruleAsString = function(hRule, hOptions = {}) {
+  var lRHS, pos, rhs, transformNonTerminal, transformTerminal;
+  ({pos, transformTerminal, transformNonTerminal} = getOptions(hOptions, {
+    pos: undef,
+    transformTerminal: identityFunc,
+    transformNonTerminal: identityFunc
+  }));
   lRHS = hRule.lParts.map((hPart) => {
     switch (hPart.type) {
       case "terminal":
-        return `\"${hPart.value}\"`;
+        return transformTerminal(hPart.value);
       case "nonterminal":
-        return `${hPart.value}`;
+        return transformNonTerminal(hPart.value);
     }
   });
   if (defined(pos)) {

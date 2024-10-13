@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // debugStr.coffee
 var _, ans, err, go, iterator, next, parser, rl, stringToParse;
 
@@ -36,7 +37,7 @@ import * as lib from '@jdeighan/grammar';
 Object.assign(global, lib);
 
 import {
-  hExprAST
+  hSimpleAST
 } from '@jdeighan/grammar/grammars';
 
 ({
@@ -57,7 +58,7 @@ stringToParse = nonEmpty(_) ? _[0] : 'a+a';
 LOG(`PARSING: ${OL(stringToParse)}`);
 
 // ---------------------------------------------------------------------------
-parser = new EarleyParser(hExprAST);
+parser = new EarleyParser(hSimpleAST);
 
 LOG(parser.asString());
 
@@ -92,7 +93,7 @@ try {
   if (err instanceof SyntaxError) {
     LOG(`Syntax Error: ${err.message}`);
   } else {
-    LOG(`ERROR: ${err.message}`);
+    throw err;
   }
   process.exit();
 }

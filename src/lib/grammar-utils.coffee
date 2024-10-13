@@ -9,17 +9,40 @@ import {
 import {MultiMap} from '@jdeighan/llutils/multi-map'
 import {
 	terminal, nonterminal, phi,
-	RuleEx, checkRule, ruleAsString,
+	RuleEx, checkRule, ruleFromString, ruleAsString,
 	} from '@jdeighan/grammar/rule-ex'
 
 # ---------------------------------------------------------------------------
 #     class Grammar
 # ---------------------------------------------------------------------------
+#     A Grammar AST looks like:
+#        {
+#           type: 'grammar'
+#           lRules: [
+#              {
+#                 type: "rule"
+#                 head: "E"
+#                 lParts: [
+#                    {type: 'nonterminal, type: 'E"},
+#                    {type: 'terminal, type: '"+"},
+#                    {type: 'nonterminal, type: '"T"},
+#                    ]
+#                 },
+#              {
+#                 type: "rule"
+#                 head: "E"
+#                 lParts: [
+#                    {type: 'nonterminal, type: '"T"},
+#                    ]
+#                 },
+#           }
+# ---------------------------------------------------------------------------
 
 export class Grammar
 
-	constructor: (@hAST) ->
+	constructor: (@hAST, hOptions={}) ->
 
+		assert isGrammarAST(@hAST), "Not a grammar AST: #{OL(@hAST)}"
 		[@setNonTerminals, @setTerminals] = checkAST @hAST
 
 	# ..........................................................
@@ -78,9 +101,17 @@ export class Grammar
 
 export class EarleyParser
 
-	constructor: (hAST) ->
+	constructor: (desc, hOptions={}) ->
 
-		@grammar = new Grammar(hAST)
+		{transform} = getOptions hOptions, {
+			transform: astFromString
+			}
+
+		# --- input can be an AST or a string
+		if isString(desc)
+			@grammar = new Grammar(transform(desc))
+		else
+			@grammar = new Grammar(desc)
 		assert @grammar instanceof Grammar, "Not a grammar"
 
 		# --- Add a phi rule at start of grammar's rule list
@@ -264,6 +295,25 @@ export class EarleyParser
 
 # ---------------------------------------------------------------------------
 #     Utility Functions
+# ---------------------------------------------------------------------------
+
+export astFromString = (str) =>
+
+	lRules = str
+		.split("\n")
+		.filter((line) => nonEmpty(line))
+		.map((line) => return ruleFromString(line))
+	return {
+		type: 'grammar'
+		lRules
+		}
+
+# ---------------------------------------------------------------------------
+
+export isGrammarAST = (desc) =>
+
+	return isHash(desc) && (desc.type == 'grammar')
+
 # ---------------------------------------------------------------------------
 # --- returns [<set of nonterminals>, <set of terminals>]
 #     croaks if RHS of a rule has an undefined nonterminal

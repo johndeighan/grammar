@@ -6,7 +6,7 @@ import {
 import {slurp} from '@jdeighan/llutils/fs'
 import * as lib from '@jdeighan/grammar'
 Object.assign(global, lib)
-import {hExprAST} from '@jdeighan/grammar/grammars'
+import {hSimpleAST} from '@jdeighan/grammar/grammars'
 
 stringToParse = process.argv[2] || 'a*a'
 
@@ -14,7 +14,7 @@ stringToParse = process.argv[2] || 'a*a'
 
 LOG "PARSING: #{OL(stringToParse)}"
 
-parser = new EarleyParser(hExprAST)
+parser = new EarleyParser(hSimpleAST)
 LOG parser.asString()
 
 try

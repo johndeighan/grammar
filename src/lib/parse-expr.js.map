@@ -1,0 +1,13 @@
+{
+  "version": 3,
+  "file": "parse-expr.js",
+  "sourceRoot": "..\\..\\",
+  "sources": [
+    "src\\lib\\parse-expr.coffee"
+  ],
+  "names": [],
+  "mappings": "AAAmB;AAAA,IAAA;;AAEnB,OAAA;EACC,KADD;EACQ,OADR;EACiB,UADjB;EAC6B,GAD7B;EACkC,EADlC;EAEC,MAFD;EAES,KAFT;CAAA,MAAA;;AAIA,OAAA;EACC,YADD;CAAA,MAAA,oBANmB;;;AAYnB,UAAA,GAAa,CAAA;;;;MAAA,EAZM;;;AAsBnB,OAAA,IAAO,SAAA,GAAY,CAAC,GAAD,CAAA,GAAA;AAEnB,MAAA;EAAC,MAAA,GAAS,IAAI,YAAJ,CAAiB,UAAjB;AACT,SAAO,MAAM,CAAC,KAAP,CAAa,GAAb;AAHW",
+  "sourcesContent": [
+    "# parse-expr.coffee\r\n\r\nimport {\r\n\tundef, defined, notdefined, LOG, OL,\r\n\tassert, croak,\r\n\t} from '@jdeighan/llutils'\r\nimport {\r\n\tEarleyParser,\r\n\t} from '@jdeighan/grammar'\r\n\r\n# ---------------------------------------------------------------------------\r\n\r\ngrammarStr = \"\"\"\r\n\tE -> E + T\r\n\tE -> T\r\n\tT -> T * P\r\n\tT -> P\r\n\tP -> a\r\n\t\"\"\"\r\n\r\n# ---------------------------------------------------------------------------\r\n\r\nexport parseExpr = (str) =>\r\n\r\n\tparser = new EarleyParser(grammarStr)\r\n\treturn parser.parse(str)\r\n"
+  ]
+}

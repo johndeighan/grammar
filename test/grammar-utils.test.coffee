@@ -10,7 +10,7 @@ import * as lib2 from '@jdeighan/llutils/utest'
 Object.assign(global, lib2)
 import * as lib from '@jdeighan/grammar'
 Object.assign(global, lib)
-import {hExprAST} from '@jdeighan/grammar/grammars'
+import {hSimpleAST} from '@jdeighan/grammar/grammars'
 
 # ---------------------------------------------------------------------------
 #symbol RuleEx
@@ -44,16 +44,16 @@ fails () => rx5 = rx4.getInc()
 
 grammar = undef
 succeeds () =>
-	grammar = new Grammar(hExprAST)
+	grammar = new Grammar(hSimpleAST)
 truthy grammar instanceof Grammar
 equal grammar.getRule(2), rule
 equal grammar.root(), "E"
 equal grammar.asString(), """
-	E -> E "+" T
+	E -> E + T
 	E -> T
-	T -> T "*" P
+	T -> T * P
 	T -> P
-	P -> "a"
+	P -> a
 	"""
 nRules = 0
 for rule from grammar.alternatives("T")
@@ -64,7 +64,7 @@ equal nRules, 2
 # ---------------------------------------------------------------------------
 #symbol EarleyParser
 
-parser = new EarleyParser(hExprAST)
+parser = new EarleyParser(hSimpleAST)
 
 succeeds () => parser.parse("a")
 succeeds () => parser.parse("a+a")
@@ -79,3 +79,50 @@ fails () => parser.parse("b*a")
 fails () => parser.parse("a++a")
 fails () => parser.parse("a+a**a")
 fails () => parser.parse("a*a+")
+
+# ---------------------------------------------------------------------------
+# create Grammar object from a string
+
+(() =>
+	grammar = new Grammar(astFromString("""
+		E -> E + T
+		E -> T
+		T -> T * P
+		T -> P
+		P -> a
+		"""))
+	equal grammar.asString(), """
+		E -> E + T
+		E -> T
+		T -> T * P
+		T -> P
+		P -> a
+		"""
+	)()
+
+# ---------------------------------------------------------------------------
+# create an EarleyParser object from a string
+
+(() =>
+	parser = new EarleyParser("""
+		E -> E + T
+		E -> T
+		T -> T * P
+		T -> P
+		P -> a
+		""")
+
+	succeeds () => parser.parse("a")
+	succeeds () => parser.parse("a+a")
+	succeeds () => parser.parse("a*a")
+	succeeds () => parser.parse("a+a")
+	succeeds () => parser.parse("a+a*a")
+	succeeds () => parser.parse("a*a+a")
+
+	fails () => parser.parse("b")
+	fails () => parser.parse("a+b")
+	fails () => parser.parse("b*a")
+	fails () => parser.parse("a++a")
+	fails () => parser.parse("a+a**a")
+	fails () => parser.parse("a*a+")
+	)()

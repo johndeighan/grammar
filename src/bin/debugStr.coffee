@@ -15,7 +15,7 @@ import {getArgs} from '@jdeighan/llutils/cmd-args'
 import {slurp} from '@jdeighan/llutils/fs'
 import * as lib from '@jdeighan/grammar'
 Object.assign(global, lib)
-import {hExprAST} from '@jdeighan/grammar/grammars'
+import {hSimpleAST} from '@jdeighan/grammar/grammars'
 
 {_, g:go} = getArgs {
 	_: {min: 0, max: 1}    # string to parse
@@ -27,7 +27,7 @@ LOG "PARSING: #{OL(stringToParse)}"
 
 # ---------------------------------------------------------------------------
 
-parser = new EarleyParser(hExprAST)
+parser = new EarleyParser(hSimpleAST)
 LOG parser.asString()
 
 iterator = parser.parse_generator(stringToParse, 'debug')
@@ -52,5 +52,5 @@ catch err
 	if (err instanceof SyntaxError)
 		LOG "Syntax Error: #{err.message}"
 	else
-		LOG "ERROR: #{err.message}"
+		throw err
 	process.exit()

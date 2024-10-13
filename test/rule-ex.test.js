@@ -14,15 +14,61 @@ import * as lib from '@jdeighan/grammar/rule-ex';
 Object.assign(global, lib);
 
 // ---------------------------------------------------------------------------
+equal(ruleFromString('E -> T'), {
+  type: 'rule',
+  head: 'E',
+  lParts: [
+    {
+      type: 'nonterminal',
+      value: 'T'
+    }
+  ]
+});
+
+equal(ruleFromString('E -> T'), {
+  type: 'rule',
+  head: 'E',
+  lParts: [nonterminal('T')]
+});
+
+equal(ruleFromString('E -> a'), {
+  type: 'rule',
+  head: 'E',
+  lParts: [
+    {
+      type: 'terminal',
+      value: 'a'
+    }
+  ]
+});
+
+equal(ruleFromString('E -> a'), {
+  type: 'rule',
+  head: 'E',
+  lParts: [terminal('a')]
+});
+
+equal(ruleFromString('Expr -> Expr + Term'), {
+  type: 'rule',
+  head: 'Expr',
+  lParts: [nonterminal('Expr'), terminal('+'), nonterminal('Term')]
+});
+
 (() => {
-  var hRule;
+  var hRule, transformTerminal;
   hRule = {
     type: "rule",
     head: "E",
     lParts: [terminal("P"), nonterminal("name"), terminal("a"), nonterminal("expr")]
   };
-  equal(ruleAsString(hRule), 'E -> "P" name "a" expr');
-  return equal(ruleAsString(hRule, 3), 'E -> "P" name "a" • expr');
+  transformTerminal = (x) => {
+    return `\"${x}\"`;
+  };
+  equal(ruleAsString(hRule, {transformTerminal}), 'E -> "P" name "a" expr');
+  return equal(ruleAsString(hRule, {
+    transformTerminal,
+    pos: 3
+  }), 'E -> "P" name "a" • expr');
 })();
 
 //# sourceMappingURL=rule-ex.test.js.map

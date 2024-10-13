@@ -6,7 +6,7 @@ import {
 
 # ---------------------------------------------------------------------------
 
-export hExprAST = {
+export hSimpleAST = {
 	type: "grammar"
 	lRules: [
 		{

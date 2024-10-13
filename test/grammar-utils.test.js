@@ -22,7 +22,7 @@ import * as lib from '@jdeighan/grammar';
 Object.assign(global, lib);
 
 import {
-  hExprAST
+  hSimpleAST
 } from '@jdeighan/grammar/grammars';
 
 // ---------------------------------------------------------------------------
@@ -66,7 +66,7 @@ fails(() => {
 grammar = undef;
 
 succeeds(() => {
-  return grammar = new Grammar(hExprAST);
+  return grammar = new Grammar(hSimpleAST);
 });
 
 truthy(grammar instanceof Grammar);
@@ -75,11 +75,11 @@ equal(grammar.getRule(2), rule);
 
 equal(grammar.root(), "E");
 
-equal(grammar.asString(), `E -> E "+" T
+equal(grammar.asString(), `E -> E + T
 E -> T
-T -> T "*" P
+T -> T * P
 T -> P
-P -> "a"`);
+P -> a`);
 
 nRules = 0;
 
@@ -93,7 +93,7 @@ equal(nRules, 2);
 
 // ---------------------------------------------------------------------------
 //symbol EarleyParser
-parser = new EarleyParser(hExprAST);
+parser = new EarleyParser(hSimpleAST);
 
 succeeds(() => {
   return parser.parse("a");
@@ -142,5 +142,66 @@ fails(() => {
 fails(() => {
   return parser.parse("a*a+");
 });
+
+// ---------------------------------------------------------------------------
+// create Grammar object from a string
+(() => {
+  grammar = new Grammar(astFromString(`E -> E + T
+E -> T
+T -> T * P
+T -> P
+P -> a`));
+  return equal(grammar.asString(), `E -> E + T
+E -> T
+T -> T * P
+T -> P
+P -> a`);
+})();
+
+// ---------------------------------------------------------------------------
+// create an EarleyParser object from a string
+(() => {
+  parser = new EarleyParser(`E -> E + T
+E -> T
+T -> T * P
+T -> P
+P -> a`);
+  succeeds(() => {
+    return parser.parse("a");
+  });
+  succeeds(() => {
+    return parser.parse("a+a");
+  });
+  succeeds(() => {
+    return parser.parse("a*a");
+  });
+  succeeds(() => {
+    return parser.parse("a+a");
+  });
+  succeeds(() => {
+    return parser.parse("a+a*a");
+  });
+  succeeds(() => {
+    return parser.parse("a*a+a");
+  });
+  fails(() => {
+    return parser.parse("b");
+  });
+  fails(() => {
+    return parser.parse("a+b");
+  });
+  fails(() => {
+    return parser.parse("b*a");
+  });
+  fails(() => {
+    return parser.parse("a++a");
+  });
+  fails(() => {
+    return parser.parse("a+a**a");
+  });
+  return fails(() => {
+    return parser.parse("a*a+");
+  });
+})();
 
 //# sourceMappingURL=grammar-utils.test.js.map
