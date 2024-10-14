@@ -204,4 +204,81 @@ P -> a`);
   });
 })();
 
+// ---------------------------------------------------------------------------
+// use a more complex grammar
+(() => {
+  parser = new EarleyParser(`E -> E + T
+E -> T
+T -> T * P
+T -> P
+P -> a
+P -> ( E )`);
+  succeeds(() => {
+    return parser.parse("a");
+  });
+  succeeds(() => {
+    return parser.parse("a+a");
+  });
+  succeeds(() => {
+    return parser.parse("a*a");
+  });
+  succeeds(() => {
+    return parser.parse("a+a");
+  });
+  succeeds(() => {
+    return parser.parse("a+a*a");
+  });
+  succeeds(() => {
+    return parser.parse("a*a+a");
+  });
+  succeeds(() => {
+    return parser.parse("(a+a)*a");
+  });
+  succeeds(() => {
+    return parser.parse("a*(a+a)");
+  });
+  succeeds(() => {
+    return parser.parse("(a*a+a)");
+  });
+  succeeds(() => {
+    return parser.parse("((a*a+a))");
+  });
+  succeeds(() => {
+    return parser.parse("(a*(a+a))");
+  });
+  succeeds(() => {
+    return parser.parse("((a*a)+a)");
+  });
+  fails(() => {
+    return parser.parse("b");
+  });
+  fails(() => {
+    return parser.parse("a+b");
+  });
+  fails(() => {
+    return parser.parse("b*a");
+  });
+  fails(() => {
+    return parser.parse("a++a");
+  });
+  fails(() => {
+    return parser.parse("a+a**a");
+  });
+  fails(() => {
+    return parser.parse("a*a+");
+  });
+  fails(() => {
+    return parser.parse("a+a**a");
+  });
+  fails(() => {
+    return parser.parse("a*a+");
+  });
+  fails(() => {
+    return parser.parse("(a+a*a");
+  });
+  return fails(() => {
+    return parser.parse("a*a+a)");
+  });
+})();
+
 //# sourceMappingURL=grammar-utils.test.js.map

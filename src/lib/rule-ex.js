@@ -96,12 +96,14 @@ export var RuleEx = (function() {
 // An hRule looks like:
 //    {
 //       type: 'rule'
+//       id: Int
 //       head: String
 //       lParts: [
 //          {
 //             type: 'terminal' | 'nonterminal',
 //             value: String
 //             }
+//          ]
 //       }
 // ---------------------------------------------------------------------------
 export var terminal = function(value) {

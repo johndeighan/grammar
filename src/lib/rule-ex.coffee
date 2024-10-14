@@ -66,12 +66,14 @@ export class RuleEx
 # An hRule looks like:
 #    {
 #       type: 'rule'
+#       id: Int
 #       head: String
 #       lParts: [
 #          {
 #             type: 'terminal' | 'nonterminal',
 #             value: String
 #             }
+#          ]
 #       }
 # ---------------------------------------------------------------------------
 

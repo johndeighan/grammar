@@ -126,3 +126,41 @@ fails () => parser.parse("a*a+")
 	fails () => parser.parse("a+a**a")
 	fails () => parser.parse("a*a+")
 	)()
+
+# ---------------------------------------------------------------------------
+# use a more complex grammar
+
+(() =>
+	parser = new EarleyParser("""
+		E -> E + T
+		E -> T
+		T -> T * P
+		T -> P
+		P -> a
+		P -> ( E )
+		""")
+
+	succeeds () => parser.parse("a")
+	succeeds () => parser.parse("a+a")
+	succeeds () => parser.parse("a*a")
+	succeeds () => parser.parse("a+a")
+	succeeds () => parser.parse("a+a*a")
+	succeeds () => parser.parse("a*a+a")
+	succeeds () => parser.parse("(a+a)*a")
+	succeeds () => parser.parse("a*(a+a)")
+	succeeds () => parser.parse("(a*a+a)")
+	succeeds () => parser.parse("((a*a+a))")
+	succeeds () => parser.parse("(a*(a+a))")
+	succeeds () => parser.parse("((a*a)+a)")
+
+	fails () => parser.parse("b")
+	fails () => parser.parse("a+b")
+	fails () => parser.parse("b*a")
+	fails () => parser.parse("a++a")
+	fails () => parser.parse("a+a**a")
+	fails () => parser.parse("a*a+")
+	fails () => parser.parse("a+a**a")
+	fails () => parser.parse("a*a+")
+	fails () => parser.parse("(a+a*a")
+	fails () => parser.parse("a*a+a)")
+	)()
